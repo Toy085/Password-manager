@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 from tkinter import ttk, messagebox
 import os
@@ -59,6 +60,7 @@ def submit_password():
             root.withdraw()
         else:
             messagebox.showerror("Error", "Incorrect password")
+            time.sleep(1)
     else:
         save_master_password(master_password)
         messagebox.showinfo("Success", "Master password created!")
@@ -85,6 +87,12 @@ password_entry.pack(pady=10)
 
 submit_button = ttk.Button(root, text="Submit", command=submit_password)
 submit_button.pack(pady=10)
+
+def set_app_icon(window):
+    icon = tk.PhotoImage(file="icon.png")
+    window.iconphoto(True, icon)
+
+set_app_icon(root)
 
 # The main application window
 def open_main_window(master_pwd):
