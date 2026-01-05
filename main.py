@@ -87,7 +87,6 @@ submit_button = ttk.Button(root, text="Submit", command=submit_password)
 submit_button.pack(pady=10)
 
 # The main application window
-
 def open_main_window(master_pwd):
     main_window = tk.Toplevel(root)
     main_window.title("Password Vault")
@@ -96,8 +95,6 @@ def open_main_window(master_pwd):
     encryption_key = get_encryption_key(master_pwd)
     cipher = Fernet(encryption_key)
     VAULT_FILE = "vault.dat"
-
-    # --- Internal Data Functions ---
 
     def load_vault():
         if not os.path.exists(VAULT_FILE):
