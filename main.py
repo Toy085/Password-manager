@@ -1,8 +1,9 @@
 import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 import os
 import hashlib
+import base64
+from cryptography.fernet import Fernet
 
 def master_password_exists() -> bool:
     return os.path.exists("master.key")
