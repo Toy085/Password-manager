@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+import os
+import hashlib
 
 # Application window for master password input
 root = tk.Tk()
@@ -33,8 +35,15 @@ def open_main_window():
     main_window.title("Password Manager")
     main_window.geometry("500x400")
 
-    label = ttk.Label(main_window, text="Welcome to your password vault!")
-    label.pack(pady=20)
+    top_frame = ttk.Frame(main_window)
+    top_frame.pack(pady=10)
 
+    middle_frame = ttk.Frame(main_window)
+    middle_frame.pack(pady=10)
+
+    bottom_frame = ttk.Frame(main_window)
+    bottom_frame.pack(pady=10)
+
+    ttk.Label(top_frame, text="Your Passwords:", font=("Arial", 14)).pack()
 
 root.mainloop()
