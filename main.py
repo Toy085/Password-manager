@@ -4,6 +4,7 @@ import os
 import hashlib
 import base64
 from cryptography.fernet import Fernet
+import json
 
 # Logic Functions
 def master_password_exists() -> bool:
@@ -18,6 +19,11 @@ def hash_master_password(password: str) -> bytes:
         200_000
     )
     return salt + key
+
+def get_encryption_key(master_password: str) -> bytes:
+    hasher = hashlib.sha256()
+    hasher.update(master_password.encode())
+    return base64.urlsafe_b64encode(hasher.digest())
 
 def save_master_password(password: str):
     hashed = hash_master_password(password)
@@ -49,14 +55,14 @@ def submit_password():
 
     if master_password_exists():
         if check_master_password(master_password):
-            open_main_window()
+            open_main_window(master_password)
             root.withdraw()
         else:
             messagebox.showerror("Error", "Incorrect password")
     else:
         save_master_password(master_password)
         messagebox.showinfo("Success", "Master password created!")
-        open_main_window()
+        open_main_window(master_password)
         root.withdraw()
 
 # Application window for master password input
@@ -80,11 +86,32 @@ password_entry.pack(pady=10)
 submit_button = ttk.Button(root, text="Submit", command=submit_password)
 submit_button.pack(pady=10)
 
-# Function to open the main application window
-def open_main_window():
+# The main application window
+
+def open_main_window(master_pwd):
     main_window = tk.Toplevel(root)
-    main_window.title("Password Manager")
+    main_window.title("Password Vault")
     main_window.geometry("500x400")
+
+    encryption_key = get_encryption_key(master_pwd)
+    cipher = Fernet(encryption_key)
+    VAULT_FILE = "vault.dat"
+
+    # --- Internal Data Functions ---
+
+    def load_vault():
+        if not os.path.exists(VAULT_FILE):
+            return {}
+        try:
+            with open(VAULT_FILE, "r") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, FileNotFoundError):
+            messagebox.showerror("Error", "Unknown error loading vault.")
+            return {}
+
+    def save_to_vault(data):
+        with open(VAULT_FILE, "w") as f:
+            json.dump(data, f, indent=4)
 
     top_frame = ttk.Frame(main_window)
     top_frame.pack(pady=10)
