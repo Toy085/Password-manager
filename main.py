@@ -118,6 +118,8 @@ def open_main_window(master_pwd):
         with open(VAULT_FILE, "w") as f:
             json.dump(data, f, indent=4)
 
+    vault_data = load_vault()
+
     top_frame = ttk.Frame(main_window)
     top_frame.pack(pady=10)
 
@@ -128,5 +130,38 @@ def open_main_window(master_pwd):
     bottom_frame.pack(pady=10)
 
     ttk.Label(top_frame, text="Your Passwords:", font=("Arial", 14)).pack()
+
+    list_scroll = ttk.Scrollbar(middle_frame)
+    list_scroll.pack(side="right", fill="y")
+    
+    account_list = tk.Listbox(middle_frame, yscrollcommand=list_scroll.set, height=10)
+    account_list.pack(fill="both", expand=True)
+    list_scroll.config(command=account_list.yview)
+
+    def update_list():
+        account_list.delete(0, tk.END)
+        for website in vault_data:
+            account_list.insert(tk.END, website)
+
+    update_list()
+
+    bottom_frame = ttk.Frame(main_window)
+    bottom_frame.pack(pady=10, padx=10, fill="x")
+
+    # Input Fields Grid
+    input_frame = ttk.Frame(bottom_frame)
+    input_frame.pack(pady=5)
+
+    ttk.Label(input_frame, text="Website/App:").grid(row=0, column=0, padx=5, sticky="e")
+    site_entry = ttk.Entry(input_frame, width=30)
+    site_entry.grid(row=0, column=1, padx=5, pady=2)
+
+    ttk.Label(input_frame, text="Username/Email:").grid(row=1, column=0, padx=5, sticky="e")
+    user_entry = ttk.Entry(input_frame, width=30)
+    user_entry.grid(row=1, column=1, padx=5, pady=2)
+
+    ttk.Label(input_frame, text="Password:").grid(row=2, column=0, padx=5, sticky="e")
+    pass_entry = ttk.Entry(input_frame, width=30, show="*") # Hide input
+    pass_entry.grid(row=2, column=1, padx=5, pady=2)
 
 root.mainloop()
