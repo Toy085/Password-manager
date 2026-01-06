@@ -164,4 +164,83 @@ def open_main_window(master_pwd):
     pass_entry = ttk.Entry(input_frame, width=30, show="*") # Hide input
     pass_entry.grid(row=2, column=1, padx=5, pady=2)
 
+    def add_password():
+        website = site_entry.get()
+        username = user_entry.get()
+        password = pass_entry.get()
+
+        if not website or not password:
+            messagebox.showwarning("Input Error", "Website and Password are required.")
+            return
+
+        # Encrypts the password
+        encrypted_pwd = cipher.encrypt(password.encode()).decode()
+
+        vault_data[website] = {
+            "username": username,
+            "password": encrypted_pwd
+        }
+        
+        save_to_vault(vault_data)
+        update_list()
+        
+        site_entry.delete(0, tk.END)
+        user_entry.delete(0, tk.END)
+        pass_entry.delete(0, tk.END)
+        messagebox.showinfo("Success", "Password saved successfully!")
+
+    def get_password():
+        try:
+            selection = account_list.curselection()
+            if not selection:
+                raise ValueError("No item selected")
+            site = account_list.get(selection[0])
+            entry = vault_data[site]
+            decrypted = cipher.decrypt(entry["password"].encode()).decode()
+            return site, entry["username"], decrypted
+            
+        except Exception:
+            messagebox.showwarning("Error", "Please select an account from the list.")
+            return None
+
+    def show_password():
+        data = get_password()
+        if data:
+            site, user, pwd = data
+            messagebox.showinfo("Account Info", f"Site: {site}\nUser: {user}\nPass: {pwd}")
+    
+    def copy_password():
+        data = get_password()
+        if data:
+            main_window.clipboard_clear()
+            main_window.clipboard_append(data[2])
+            messagebox.showinfo("Copied", "Password copied to clipboard!")
+        else: 
+            messagebox.showwarning("Error", "Please select an account from the list.")
+
+    def delete_password():
+        try:
+            selected = account_list.get(account_list.curselection())
+            confirm = messagebox.askyesno("Confirm Delete", f"Delete password for {selected}?")
+            if confirm:
+                del vault_data[selected]
+                save_to_vault(vault_data)
+                update_list()
+        except tk.TclError:
+            messagebox.showwarning("Selection Error", "Please select an account to delete.")
+
+    btn_frame = ttk.Frame(bottom_frame)
+    btn_frame.pack(pady=10)
+
+    ttk.Button(btn_frame, text="Add Password", command=add_password).grid(row=0, column=0, padx=5)
+    ttk.Button(btn_frame, text="Get Password", command=show_password).grid(row=0, column=1, padx=5)
+    ttk.Button(btn_frame, text="Copy Password", command=copy_password).grid(row=0, column=2, padx=5)
+    ttk.Button(btn_frame, text="Delete Password", command=delete_password).grid(row=0, column=3, padx=5)
+
+    def on_close():
+        main_window.destroy()
+        root.destroy()
+        
+    main_window.protocol("WM_DELETE_WINDOW", on_close)
+
 root.mainloop()
