@@ -88,11 +88,13 @@ password_entry.pack(pady=10)
 submit_button = ttk.Button(root, text="Submit", command=submit_password)
 submit_button.pack(pady=10)
 
-def set_app_icon(window):
-    icon = tk.PhotoImage(file="icon.png")
-    window.iconphoto(True, icon)
-
-set_app_icon(root)
+# Set application icon if available
+try:
+    if os.path.exists("icon.png"):
+        icon = tk.PhotoImage(file="icon.png")
+        root.iconphoto(True, icon)
+except Exception:
+    pass
 
 # The main application window
 def open_main_window(master_pwd):
